@@ -27,6 +27,7 @@ public class CollectionsHelper {
   // https://javatutorial.net/choose-the-right-java-collection
   // http://anh.cs.luc.edu/363/notes/06A_Amortizing.html
   // https://www.developer.com/java/article.php/10922_3829891_2/Selecting-the-Best-Java-Collection-Class-for-Your-Application.htm
+  // https://stackoverflow.com/questions/21974361/which-java-collection-should-i-use
 
   /**
    * NOTE: this should only be used to guide your choices, always read the Java documentation of the class of the returned instance.
@@ -94,9 +95,7 @@ public class CollectionsHelper {
 
       final boolean isForSortWithComparator, // 2
 
-      final boolean isForConcurrentAccess, // 3
-
-      final int capacityHint // 4
+      final int capacityHint // 3
 
   ) {
     // --- NO DUPLICATES ---
@@ -105,17 +104,6 @@ public class CollectionsHelper {
     if (isPreserveInsertionOrder && isForSortWithComparator) {
       throw new AssertionError("Preserving insertion order and sorting by comparator is not compatible !");
     }
-    if (isForConcurrentAccess) {
-      // https://stackoverflow.com/questions/29249714/when-is-copyonwritearrayset-useful-to-achieve-thread-safe-hashset
-      // https://stackoverflow.com/questions/6720396/different-types-of-thread-safe-sets-in-java
-      if (capacityHint <= 16) {
-        return new CopyOnWriteArraySet<T>();
-      }
-      if (isForSortWithComparator) {
-        return new ConcurrentSkipListSet<T>();
-      }
-      return Collections.synchronizedSet(new HashSet<T>());
-    }
     if (isPreserveInsertionOrder) {
       return new LinkedHashSet<T>(capacityHint);
     }
@@ -123,6 +111,29 @@ public class CollectionsHelper {
       return new TreeSet<T>();
     }
     return new HashSet<T>(capacityHint);
+  }
+
+  /**
+   * NOTE: this should only be used to guide your choices, always read the Java documentation of the class of the returned instance.
+   */
+  public static final <T> Collection<T> buildCollectionWithoutDuplicatesWithThreads(
+
+      final boolean isForMoreReadsThanWrites, // 1
+
+      final boolean isForSortWithComparator // 2
+
+  ) {
+    // --- NO DUPLICATES ---
+    // Can be a SET.
+    // https://stackoverflow.com/questions/29249714/when-is-copyonwritearrayset-useful-to-achieve-thread-safe-hashset
+    // https://stackoverflow.com/questions/6720396/different-types-of-thread-safe-sets-in-java
+    if (isForSortWithComparator) {
+      return new ConcurrentSkipListSet<T>();
+    }
+    if (isForMoreReadsThanWrites) {
+      return new CopyOnWriteArraySet<T>();
+    }
+    return Collections.synchronizedSet(new HashSet<T>());
   }
 
   public static void main(final String[] args) {
@@ -145,12 +156,12 @@ public class CollectionsHelper {
     }
     // --- WITHOUT DUPLICATES.
     {
-      final Collection<String> collection = buildCollectionWithoutDuplicates(true, false, true, 16);
+      final Collection<String> collection = buildCollectionWithoutDuplicates(true, false, 16);
       System.out.println(collection instanceof CopyOnWriteArraySet<?>);
       System.out.println(collection.getClass().getName());
     }
     {
-      final Collection<String> collection = buildCollectionWithoutDuplicates(false, true, false, 16);
+      final Collection<String> collection = buildCollectionWithoutDuplicates(false, true, 16);
       System.out.println(collection instanceof TreeSet<?>);
       System.out.println(collection.getClass().getName());
     }
