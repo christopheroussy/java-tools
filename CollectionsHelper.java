@@ -157,12 +157,17 @@ public class CollectionsHelper {
     // --- WITHOUT DUPLICATES.
     {
       final Collection<String> collection = buildCollectionWithoutDuplicates(true, false, 16);
-      System.out.println(collection instanceof CopyOnWriteArraySet<?>);
+      System.out.println(collection instanceof LinkedHashSet<?>);
       System.out.println(collection.getClass().getName());
     }
     {
       final Collection<String> collection = buildCollectionWithoutDuplicates(false, true, 16);
       System.out.println(collection instanceof TreeSet<?>);
+      System.out.println(collection.getClass().getName());
+    }
+    {
+      final Collection<String> collection = buildCollectionWithoutDuplicatesWithThreads(true, false);
+      System.out.println(collection instanceof CopyOnWriteArraySet<?>);
       System.out.println(collection.getClass().getName());
     }
   }
