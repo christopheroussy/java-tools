@@ -23,8 +23,6 @@ import org.eclipse.jdt.annotation.NonNull;
  * NOTE: Findbugs may also find some of these bugs.
  * 
  * @author croussy
- * 
- * @author NOTE: This is a neutral tool, it could be open-source.
  */
 @CheckReturnValue
 public final class TypeSafe<T> {
@@ -119,30 +117,6 @@ public final class TypeSafe<T> {
     return u1.equals(u2);
   }
 
-  // Some examples:
-  public static void main(final String[] args) {
-    {
-      final String bob = "Bob";
-      final String tom = "Tom";
-      bob.equals(tom);
-      // Equals breaks typing by accepting an Integer !
-      // bob.equals(1);
-      TypeSafe.build(bob).equalsTyped(tom);
-      // TypeSafe.build(bob).equalsTyped(1);
-      // TypeSafe.build(bob).equals(1);
-      TypeSafe.equalsString(bob, tom);
-    }
-    {
-      final Collection<String> collection = new ArrayList<>();
-      TypeSafe.collectionContains(collection, "bob");
-    }
-    {
-      final Map<String, Integer> map = new HashMap<>();
-      TypeSafe.mapGet(map, "");
-      TypeSafe.mapContainsKey(map, "");
-    }
-  }
-
   public static <K, V> boolean mapContainsKey(final Map<K, V> map, final K key) {
     assert key != null;
     return map.containsKey(key);
@@ -170,5 +144,29 @@ public final class TypeSafe<T> {
     assert date != null;
     // Incredible, but this can take and Object, thus needs to be protected.
     return sdf.format(date);
+  }
+  
+  // Some examples:
+  public static void main(final String[] args) {
+    {
+      final String bob = "Bob";
+      final String tom = "Tom";
+      bob.equals(tom);
+      // Equals breaks typing by accepting an Integer !
+      // bob.equals(1);
+      TypeSafe.build(bob).equalsTyped(tom);
+      // TypeSafe.build(bob).equalsTyped(1);
+      // TypeSafe.build(bob).equals(1);
+      TypeSafe.equalsString(bob, tom);
+    }
+    {
+      final Collection<String> collection = new ArrayList<>();
+      TypeSafe.collectionContains(collection, "bob");
+    }
+    {
+      final Map<String, Integer> map = new HashMap<>();
+      TypeSafe.mapGet(map, "");
+      TypeSafe.mapContainsKey(map, "");
+    }
   }
 }
